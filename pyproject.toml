@@ -122,6 +122,7 @@ dependencies = [
     "yarl>=1.18.3",
     "aiohappyeyeballs>=2.4.4",
     "python-dotenv>=1.0.1",
+    "rouge-score>=0.1.2",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
