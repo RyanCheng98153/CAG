@@ -47,7 +47,7 @@ pip install -r ./requirements.txt
 ## Parameter Usage -- kvcache.py
 - `--kvcache`: "file"
 - `--dataset`: "hotpotqa-train" or "squad-train"
-- `--similarity` "bertscore"
+- `--similarity` "bertscore", "rouge1", "rougeL"
 - `--modelname`: "meta-llama/Llama-3.1-8B-Instruct"
 - `--maxKnowledge`: "", int, select how many document in dataset, explanation in Note
 - `--maxParagraph`: 100
@@ -67,7 +67,7 @@ python ./kvcache.py --kvcache file --dataset "squad-train" --similarity bertscor
 ## Parameter Usage -- rag.py
 - `--index`: "openai" or "bm25"
 - `--dataset`: "hotpotqa-train" or "squad-train"
-- `--similarity` "bertscore"
+- `--similarity` "bertscore", "rouge1", "rougeL"
 - `--maxKnowledge`: "", int, select how many document in dataset, explanation in Note
 - `--maxParagraph`: 100
 - `--maxQuestion` int, max question number, explanation in Note
