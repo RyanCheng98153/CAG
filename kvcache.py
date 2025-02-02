@@ -9,6 +9,7 @@ from transformers import BitsAndBytesConfig, AutoTokenizer, AutoModelForCausalLM
 from transformers.cache_utils import DynamicCache
 import random
 import logging 
+from rouge_score import rouge_scorer
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -155,6 +156,16 @@ def get_bert_similarity(response, ground_truth):
     cosine_score = util.pytorch_cos_sim(query_embedding, text_embedding)
 
     return cosine_score.item()
+
+def get_rouge1_similarity(response, ground_truth):
+    scorer = rouge_scorer.RougeScorer(['rouge1'], use_stemmer=True)
+    scores = scorer.score(response, ground_truth)
+    return scores['rouge1'].fmeasure
+
+def get_rougeL_similarity(response, ground_truth):
+    scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=True)
+    scores = scorer.score(response, ground_truth)
+    return scores['rougeL'].fmeasure
 
 
 def prepare_kvcache(documents, filepath: str = "./data_cache/cache_knowledges.pt", answer_instruction: str | None = None):
@@ -379,7 +390,14 @@ def kvcache_test(args: argparse.Namespace):
         print("A: ", generated_text)
  
         # Evaluate bert-score similarity
-        similarity = get_bert_similarity(generated_text, ground_truth)
+        if args.similarity == "bertscore":
+            similarity = get_bert_similarity(generated_text, ground_truth)
+        # Evaluate rouge1 similarity
+        if args.similarity == "rouge1":
+            similarity = get_rouge1_similarity(generated_text, ground_truth)
+        # Evaluate rougeL similarity
+        if args.similarity == "rougeL":
+            similarity = get_rougeL_similarity(generated_text, ground_truth)
 
         print(f"[{id}]: Semantic Similarity: {round(similarity, 5)},",
               f"cache time: {cache_t2 - cache_t1},",
@@ -449,7 +467,7 @@ if __name__ == "__main__":
     parser.add_argument('--modelname', required=False, default="meta-llama/Llama-3.2-1B-Instruct", type=str, help='Model name to use')
     parser.add_argument('--quantized', required=False, default=False, type=bool, help='Quantized model')
     parser.add_argument('--kvcache', choices=['file'], required=True, help='Method to use (from_file or from_var)')
-    parser.add_argument('--similarity', choices=['bertscore'], required=True, help='Similarity metric to use (bertscore)')
+    parser.add_argument('--similarity', choices=['bertscore', 'rouge1', 'rougeL'], required=True, help='Similarity metric to use (bertscore, rouge1, rougeL)')
     parser.add_argument('--output', required=True, type=str, help='Output file to save the results')
     parser.add_argument('--maxQuestion', required=False, default=None, type=int, help='Maximum number of questions to test')
     parser.add_argument('--maxKnowledge', required=False, default=None, type=int, help='Maximum number of knowledge items to use')
